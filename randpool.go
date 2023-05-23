@@ -33,6 +33,17 @@ func NewRandPool() *RandPool {
 	}
 }
 
+// NewCSMRandPool returns a new RandPool instance with a secure source
+func NewCSMRandPool() *RandPool {
+	return &RandPool{
+		p: sync.Pool{
+			New: func() interface{} {
+				return rand.New(&CSStatefulRandSource{})
+			},
+		},
+	}
+}
+
 // Get is safe for use from concurrent goroutines, but the returned *rand.Rand instance isn't.
 func (p *RandPool) Get() *rand.Rand {
 	return p.p.Get().(*rand.Rand)

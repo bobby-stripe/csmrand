@@ -5,13 +5,29 @@ import (
 	"testing"
 )
 
-func BenchmarkFastRand64(b *testing.B) {
+func BenchmarkFastrand64(b *testing.B) {
 	b.ReportAllocs()
 	b.SetBytes(8)
 	b.RunParallel(func(pb *testing.PB) {
 		var f uint64
 		for pb.Next() {
 			f = fastrand64()
+		}
+		_ = f
+	})
+}
+
+func BenchmarkCSMSafepoolFloat64(b *testing.B) {
+	prf := &pooledRandFloater{
+		rndPool: NewCSMRandPool(),
+	}
+
+	b.ReportAllocs()
+	b.SetBytes(8)
+	b.RunParallel(func(pb *testing.PB) {
+		var f float64
+		for pb.Next() {
+			f = prf.Float64()
 		}
 		_ = f
 	})
