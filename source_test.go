@@ -5,6 +5,32 @@ import (
 	"testing"
 )
 
+func BenchmarkFastRand64(b *testing.B) {
+	b.ReportAllocs()
+	b.SetBytes(8)
+	b.RunParallel(func(pb *testing.PB) {
+		var f uint64
+		for pb.Next() {
+			f = fastrand64()
+		}
+		_ = f
+	})
+}
+
+func BenchmarkSafepoolFloat64(b *testing.B) {
+	prf := newPooledRandomFloater()
+
+	b.ReportAllocs()
+	b.SetBytes(8)
+	b.RunParallel(func(pb *testing.PB) {
+		var f float64
+		for pb.Next() {
+			f = prf.Float64()
+		}
+		_ = f
+	})
+}
+
 func TestCSRandSource_Int63(t *testing.T) {
 	var f float64
 	allocs := testing.AllocsPerRun(1, func() {
